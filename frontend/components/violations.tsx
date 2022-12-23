@@ -9,12 +9,14 @@ let jobID: number | null;
 export default function Violations() {
 	const [violations, setViolations] = useState<Violation[]>([]);
 
-	const updateViolations = () => {
-		fetch("/api/violations")
-			.then((response) => response.json())
-			.then((result) => {
-				setViolations(JSON.parse(result));
-			});
+	const updateViolations = async () => {
+		try {
+			const response = await fetch("/api/violations");
+			const result = await response.json();
+			setViolations(JSON.parse(result));
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	useEffect(() => {

@@ -27,7 +27,7 @@ export async function getUpdatedViolations(
 				NDZ_MID_POINT.y,
 				drone.positionY[0]
 			);
-			if (distance < NDZ_RADIUS) {
+			if (distance <= NDZ_RADIUS) {
 				const response = await fetch(
 					API_URL_PILOTS + drone.serialNumber[0]
 				);
