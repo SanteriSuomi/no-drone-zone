@@ -10,11 +10,17 @@ let violations: Violation[] = [];
 
 setInterval(() => {
 	fetch(API_URL_DRONES)
-		.then((response: any) => response.text())
-		.then(async (droneXmlResult: any) => {
-			const parseResult = await parseStringPromise(droneXmlResult);
-			const drones = parseResult.report.capture[0].drone;
-			violations = await getUpdatedViolations(drones, [...violations]);
+		.then((response) => response.text())
+		.then(async (xmlResult) => {
+			try {
+				const parseResult = await parseStringPromise(xmlResult);
+				const drones = parseResult.report.capture[0].drone;
+				violations = await getUpdatedViolations(drones, [
+					...violations,
+				]);
+			} catch (error) {
+				console.log(error);
+			}
 		});
 }, REFRESH_SPEED);
 

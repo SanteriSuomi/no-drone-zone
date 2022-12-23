@@ -18,7 +18,7 @@ export function euclideanDistance(
 export async function getUpdatedViolations(
 	drones: Drone[],
 	savedViolations: Violation[]
-): Promise<Violation[]> {
+) {
 	const retrievedViolations: (Violation | void)[] = await Promise.all(
 		drones.map(async (drone: Drone) => {
 			const distance = euclideanDistance(
@@ -28,8 +28,10 @@ export async function getUpdatedViolations(
 				drone.positionY[0]
 			);
 			if (distance < NDZ_RADIUS) {
-				const res = await fetch(API_URL_PILOTS + drone.serialNumber[0]);
-				const pilot = await res.json();
+				const response = await fetch(
+					API_URL_PILOTS + drone.serialNumber[0]
+				);
+				const pilot = await response.json();
 				return Promise.resolve({
 					timestamp: new Date().getTime(),
 					distance: distance,
