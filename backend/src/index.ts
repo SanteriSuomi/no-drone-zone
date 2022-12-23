@@ -3,7 +3,6 @@ import { Violation } from "./types/types";
 import { parseStringPromise } from "xml2js";
 import { getUpdatedViolations } from "./utils/functions";
 import { API_URL_DRONES, REFRESH_SPEED, PORT } from "./utils/constants";
-const fetch = require("node-fetch");
 
 const app = express();
 
