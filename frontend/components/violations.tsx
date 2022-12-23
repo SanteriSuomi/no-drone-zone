@@ -26,12 +26,14 @@ export default function Violations() {
 	}, []);
 
 	const getViolationComponents = () => {
-		return violations.map((violation: Violation, index: number) => (
-			<ViolationComponent
-				key={index}
-				violation={violation}
-			></ViolationComponent>
-		));
+		return violations.map((violation: Violation, index: number) => {
+			return (
+				<ViolationComponent
+					key={index}
+					violation={violation}
+				></ViolationComponent>
+			);
+		});
 	};
 
 	return (

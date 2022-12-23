@@ -50,7 +50,10 @@ export async function getUpdatedViolations(
 		{ violation: Violation; index: number }
 	>();
 	savedViolations.forEach((violation: Violation, index: number) => {
-		if (violation.timestamp + EXPIRATION_TIME > new Date().getTime()) {
+		if (
+			violation &&
+			violation.timestamp + EXPIRATION_TIME > new Date().getTime()
+		) {
 			updatedViolations.push(violation);
 			savedViolationMap.set(violation.drone.mac[0], {
 				violation: violation,
@@ -60,15 +63,12 @@ export async function getUpdatedViolations(
 	});
 
 	retrievedViolations.forEach((violation: Violation | void) => {
-		if (violation) {
-			const existingViolation = savedViolationMap.get(
-				violation.drone.mac[0]
-			);
-			if (existingViolation) {
-				updatedViolations[existingViolation.index] = violation;
-			} else {
-				updatedViolations.push(violation);
-			}
+		if (!violation) return;
+		const existingViolation = savedViolationMap.get(violation.drone.mac[0]);
+		if (existingViolation) {
+			updatedViolations[existingViolation.index] = violation;
+		} else {
+			updatedViolations.push(violation);
 		}
 	});
 
