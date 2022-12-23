@@ -1,5 +1,10 @@
 import { Drone, Violation } from "../types/types";
-import { EXPIRATION_TIME, NDZ_MID_POINT, NDZ_RADIUS } from "../utils/constants";
+import {
+	API_URL_PILOTS,
+	EXPIRATION_TIME,
+	NDZ_MID_POINT,
+	NDZ_RADIUS,
+} from "../utils/constants";
 
 export function euclideanDistance(
 	startX: number,
@@ -11,7 +16,8 @@ export function euclideanDistance(
 }
 
 export async function getUpdatedViolations(
-	drones: Drone[]
+	drones: Drone[],
+	savedViolations: Violation[]
 ): Promise<Violation[]> {
 	const retrievedViolations: (Violation | void)[] = await Promise.all(
 		drones.map(async (drone: Drone) => {
@@ -22,7 +28,7 @@ export async function getUpdatedViolations(
 				drone.positionY[0]
 			);
 			if (distance < NDZ_RADIUS) {
-				const res = await fetch("/api/pilots/" + drone.serialNumber[0]);
+				const res = await fetch(API_URL_PILOTS + drone.serialNumber[0]);
 				const pilot = await res.json();
 				return Promise.resolve({
 					timestamp: new Date().getTime(),
@@ -36,10 +42,6 @@ export async function getUpdatedViolations(
 	);
 
 	const updatedViolations: Violation[] = [];
-
-	const savedViolations: Violation[] = JSON.parse(
-		localStorage.getItem("violations") ?? "[]"
-	);
 
 	const savedViolationMap = new Map<
 		string,
