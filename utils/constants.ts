@@ -7,7 +7,7 @@ const NDZ_RADIUS = 100000;
 
 const EXPIRATION_TIME = 600000;
 
-const REFRESH_SPEED = 10000;
+const REFRESH_SPEED = 4000;
 
 const API_URL_DRONES = "https://assignments.reaktor.com/birdnest/drones";
 
