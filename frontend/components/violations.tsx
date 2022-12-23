@@ -27,6 +27,7 @@ export default function Violations() {
 
 	const getViolationComponents = () => {
 		return violations.map((violation: Violation, index: number) => {
+			if (!violation) return <></>;
 			return (
 				<ViolationComponent
 					key={index}
