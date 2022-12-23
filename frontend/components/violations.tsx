@@ -37,7 +37,10 @@ export default function Violations() {
 	return (
 		<div className={styles.content}>
 			<div className={styles.title}>
-				Violations (in the past 10 minutes)
+				Violations{" "}
+				<span className={styles.subtitle}>
+					in the past 10 minutes sorted by distance to the nest
+				</span>
 			</div>
 			<div className={styles.violationList}>
 				{getViolationComponents()}
