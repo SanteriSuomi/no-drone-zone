@@ -3,6 +3,7 @@ import { Violation } from "./types/types";
 import { parseStringPromise } from "xml2js";
 import { getUpdatedViolations } from "./utils/functions";
 import { API_URL_DRONES, REFRESH_SPEED, PORT } from "./utils/constants";
+const fetch = require("node-fetch");
 
 const app = express();
 
@@ -10,8 +11,8 @@ let violations: Violation[] = [];
 
 setInterval(() => {
 	fetch(API_URL_DRONES)
-		.then((response) => response.text())
-		.then(async (droneXmlResult) => {
+		.then((response: any) => response.text())
+		.then(async (droneXmlResult: any) => {
 			const parseResult = await parseStringPromise(droneXmlResult);
 			const drones = parseResult.report.capture[0].drone;
 			violations = await getUpdatedViolations(drones, [...violations]);
