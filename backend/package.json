@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "dist/index.js",
 	"scripts": {
-		"build": "npm install && npm run build",
+		"build": "npm install && tsc && npm run build",
 		"start": "node .",
 		"dev-watch": "tsc -w",
 		"dev": "npm run build && nodemon ."
