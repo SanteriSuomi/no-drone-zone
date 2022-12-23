@@ -5,6 +5,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   width: 75%;
+  max-width: 500px;
 }
 
 .title {
