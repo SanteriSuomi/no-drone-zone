@@ -1,4 +1,4 @@
-const REFRESH_SPEED = 3000;
+const REFRESH_SPEED = 2500;
 
 const API_URL_VIOLATIONS =
 	"https://no-drone-zone-backend.onrender.com/violations";

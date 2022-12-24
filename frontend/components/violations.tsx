@@ -21,10 +21,10 @@ export default function Violations() {
 
 	useEffect(() => {
 		if (jobID) return;
+		updateViolations();
 		jobID = window.setInterval(() => {
 			updateViolations();
 		}, REFRESH_SPEED);
-		updateViolations();
 	}, []);
 
 	const getViolationComponents = () => {

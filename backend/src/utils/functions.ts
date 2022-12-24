@@ -1,12 +1,14 @@
+import { parseStringPromise } from "xml2js";
 import { Drone, Violation } from "../types/types";
 import {
+	API_URL_DRONES,
 	API_URL_PILOTS,
 	EXPIRATION_TIME,
 	NDZ_MID_POINT,
 	NDZ_RADIUS,
 } from "../utils/constants";
 
-export function euclideanDistance(
+function euclideanDistance(
 	startX: number,
 	endX: number,
 	startY: number,
@@ -15,9 +17,23 @@ export function euclideanDistance(
 	return Math.hypot(endX - startX, endY - startY);
 }
 
-export async function getUpdatedViolations(
+async function refreshViolations(currentViolations: Violation[]) {
+	let violations: Violation[] | null;
+	const response = await fetch(API_URL_DRONES);
+	const result = await response.text();
+	try {
+		const parseResult = await parseStringPromise(result);
+		const drones = parseResult.report.capture[0].drone;
+		violations = await getUpdatedViolations(drones, [...currentViolations]);
+	} catch (error) {
+		console.log(error);
+	}
+	return violations;
+}
+
+async function getUpdatedViolations(
 	drones: Drone[],
-	savedViolations: Violation[]
+	currentViolations: Violation[]
 ) {
 	const retrievedViolations: (Violation | void)[] = await Promise.all(
 		drones.map(async (drone: Drone) => {
@@ -49,7 +65,7 @@ export async function getUpdatedViolations(
 		string,
 		{ violation: Violation; index: number }
 	>();
-	savedViolations.forEach((violation: Violation, index: number) => {
+	currentViolations.forEach((violation: Violation, index: number) => {
 		if (
 			violation &&
 			violation.timestamp + EXPIRATION_TIME > new Date().getTime()
@@ -63,12 +79,15 @@ export async function getUpdatedViolations(
 	});
 
 	retrievedViolations.forEach((violation: Violation | void) => {
-		if (!violation) return;
-		const existingViolation = savedViolationMap.get(violation.drone.mac[0]);
-		if (existingViolation) {
-			updatedViolations[existingViolation.index] = violation;
-		} else {
-			updatedViolations.push(violation);
+		if (violation) {
+			const existingViolation = savedViolationMap.get(
+				violation.drone.mac[0]
+			);
+			if (existingViolation) {
+				updatedViolations[existingViolation.index] = violation;
+			} else {
+				updatedViolations.push(violation);
+			}
 		}
 	});
 
@@ -76,3 +95,5 @@ export async function getUpdatedViolations(
 		a.distance > b.distance ? 1 : -1
 	);
 }
+
+export { refreshViolations, getUpdatedViolations };
