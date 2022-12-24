@@ -1,5 +1,5 @@
 import { parseStringPromise } from "xml2js";
-import { Drone, Violation } from "../types/types";
+import { ApiData, Drone, Violation } from "../types/types";
 import {
 	API_URL_DRONES,
 	API_URL_PILOTS,
@@ -18,27 +18,28 @@ function euclideanDistance(
 }
 
 async function refreshViolations(savedViolations: Violation[]) {
-	let violations: Violation[] | null;
 	const response = await fetch(API_URL_DRONES);
 	const result = await response.text();
+
+	let updateData: ApiData = { updated: false, violations: null };
 	await parseStringPromise(result, { explicitArray: false })
 		.then(async (parseResult) => {
 			const drones = parseResult.report.capture.drone;
-			violations = await getUpdatedViolations(drones, [
+			updateData = await getUpdatedViolations(drones, [
 				...savedViolations,
 			]);
 		})
 		.catch((reason) => {
 			console.log(reason);
 		});
-	return violations;
+	return updateData;
 }
 
 async function getUpdatedViolations(
 	drones: Drone[],
-	currentViolations: Violation[]
+	savedViolations: Violation[]
 ) {
-	const retrievedViolations: (Violation | void)[] = await Promise.all(
+	const newViolations: (Violation | void)[] = await Promise.all(
 		drones.map(async (drone: Drone) => {
 			const distance = euclideanDistance(
 				NDZ_MID_POINT.x,
@@ -63,12 +64,13 @@ async function getUpdatedViolations(
 	);
 
 	const updatedViolations: Violation[] = [];
+	let updated = false;
 
 	const savedViolationMap = new Map<
 		string,
 		{ violation: Violation; index: number }
 	>();
-	currentViolations.forEach((violation: Violation, index: number) => {
+	savedViolations.forEach((violation: Violation, index: number) => {
 		if (
 			violation &&
 			violation.timestamp + EXPIRATION_TIME > new Date().getTime()
@@ -78,10 +80,11 @@ async function getUpdatedViolations(
 				violation: violation,
 				index: index,
 			});
+			updated = true;
 		}
 	});
 
-	retrievedViolations.forEach((violation: Violation | void) => {
+	newViolations.forEach((violation: Violation | void) => {
 		if (violation) {
 			const existingViolation = savedViolationMap.get(
 				violation.drone.mac
@@ -91,12 +94,14 @@ async function getUpdatedViolations(
 			} else {
 				updatedViolations.push(violation);
 			}
+			updated = true;
 		}
 	});
 
-	return updatedViolations.sort((a: Violation, b: Violation) =>
+	updatedViolations.sort((a: Violation, b: Violation) =>
 		a.distance > b.distance ? 1 : -1
 	);
+	return { updated: updated, violations: updatedViolations };
 }
 
 export { refreshViolations, getUpdatedViolations };

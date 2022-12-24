@@ -27,4 +27,9 @@ interface Violation {
 	pilot: Pilot | null;
 }
 
-export type { Drone, Pilot, Violation };
+interface ApiData {
+	updated: boolean;
+	violations: Violation[] | null;
+}
+
+export type { Drone, Pilot, Violation, ApiData };

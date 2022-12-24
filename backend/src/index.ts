@@ -1,23 +1,22 @@
-import express from "express";
+import WebSocket from "ws";
 import { Violation } from "./types/types";
 import { refreshViolations } from "./utils/functions";
-import { REFRESH_SPEED, PORT } from "./utils/constants";
+import { PORT, REFRESH_SPEED } from "./utils/constants";
 
-const app = express();
+const websocketServer = new WebSocket.Server({ port: PORT });
 
 let savedViolations: Violation[] = [];
 
+websocketServer.on("connection", (client) => {
+	client.send(JSON.stringify(savedViolations));
+});
+
 setInterval(async () => {
-	const newViolations = await refreshViolations(savedViolations);
-	if (newViolations) {
-		savedViolations = newViolations;
+	const updateData = await refreshViolations(savedViolations);
+	if (updateData.updated) {
+		savedViolations = updateData.violations;
+		websocketServer.clients.forEach((client) => {
+			client.send(JSON.stringify(savedViolations));
+		});
 	}
 }, REFRESH_SPEED);
-
-app.get("/violations", (_req, res) => {
-	res.status(200).json(JSON.stringify(savedViolations));
-});
-
-app.listen(PORT, () => {
-	console.log(`Listening on port ${PORT}`);
-});

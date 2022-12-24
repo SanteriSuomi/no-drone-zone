@@ -1,33 +1,24 @@
 import { useEffect, useState } from "react";
 import styles from "../styles/Violations.module.css";
 import { Violation } from "../types/types";
-import { API_URL_LOCAL_VIOLATIONS, REFRESH_SPEED } from "../utils/constants";
+import { WS_API_URL_VIOLATIONS } from "../utils/constants";
 import ViolationComponent from "./violation";
-
-let jobID: number | null;
 
 export default function Violations() {
 	const [violations, setViolations] = useState<Violation[]>([]);
 
-	const updateViolations = async () => {
-		await fetch(API_URL_LOCAL_VIOLATIONS)
-			.then((response) => response.json())
-			.then((result) => {
-				try {
-					setViolations(JSON.parse(result));
-				} catch (error) {
-					console.log(error);
-				}
-			})
-			.catch((error) => console.log(error));
-	};
-
 	useEffect(() => {
-		if (jobID) return;
-		updateViolations();
-		jobID = window.setInterval(() => {
-			updateViolations();
-		}, REFRESH_SPEED);
+		const socket = new WebSocket(WS_API_URL_VIOLATIONS);
+		socket.onmessage = (event) => {
+			try {
+				setViolations(JSON.parse(event.data));
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		return () => {
+			socket.close();
+		};
 	}, []);
 
 	const getViolationComponents = () => {

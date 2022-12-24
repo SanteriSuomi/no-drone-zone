@@ -1,8 +1,3 @@
-const REFRESH_SPEED = 2500;
+const WS_API_URL_VIOLATIONS = "wss://no-drone-zone-backend.onrender.com";
 
-const API_URL_LOCAL_VIOLATIONS = "/api/violations";
-
-const API_URL_VIOLATIONS =
-	"https://no-drone-zone-backend.onrender.com/violations";
-
-export { REFRESH_SPEED, API_URL_LOCAL_VIOLATIONS, API_URL_VIOLATIONS };
+export { WS_API_URL_VIOLATIONS };
