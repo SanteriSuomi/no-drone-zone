@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "../styles/Violations.module.css";
 import { Violation } from "../types/types";
-import { REFRESH_SPEED } from "../utils/constants";
+import { API_URL_LOCAL_VIOLATIONS, REFRESH_SPEED } from "../utils/constants";
 import ViolationComponent from "./violation";
 
 let jobID: number | null;
@@ -10,13 +10,16 @@ export default function Violations() {
 	const [violations, setViolations] = useState<Violation[]>([]);
 
 	const updateViolations = async () => {
-		try {
-			const response = await fetch("/api/violations");
-			const result = await response.json();
-			setViolations(JSON.parse(result));
-		} catch (error) {
-			console.log(error);
-		}
+		await fetch(API_URL_LOCAL_VIOLATIONS)
+			.then((response) => response.json())
+			.then((result) => {
+				try {
+					setViolations(JSON.parse(result));
+				} catch (error) {
+					console.log(error);
+				}
+			})
+			.catch((error) => console.log(error));
 	};
 
 	useEffect(() => {
