@@ -5,17 +5,17 @@ import { REFRESH_SPEED, PORT } from "./utils/constants";
 
 const app = express();
 
-let violations: Violation[] = [];
+let savedViolations: Violation[] = [];
 
 setInterval(async () => {
-	const newViolations = await refreshViolations(violations);
+	const newViolations = await refreshViolations(savedViolations);
 	if (newViolations) {
-		violations = newViolations;
+		savedViolations = newViolations;
 	}
 }, REFRESH_SPEED);
 
 app.get("/violations", (_req, res) => {
-	res.status(200).json(JSON.stringify(violations));
+	res.status(200).json(JSON.stringify(savedViolations));
 });
 
 app.listen(PORT, () => {

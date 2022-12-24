@@ -40,16 +40,19 @@ export default function Violations() {
 	};
 
 	return (
-		<div className={styles.content}>
-			<div className={styles.title}>
-				Violations{" "}
-				<span className={styles.subtitle}>
-					in the past 10 minutes sorted by distance to the nest
-				</span>
+		<>
+			<div className={styles.marginElement}></div>
+			<div className={styles.content}>
+				<div className={styles.title}>
+					Violations{" "}
+					<span className={styles.subtitle}>
+						in the past 10 minutes sorted by distance to the nest
+					</span>
+				</div>
+				<div className={styles.violationList}>
+					{getViolationComponents()}
+				</div>
 			</div>
-			<div className={styles.violationList}>
-				{getViolationComponents()}
-			</div>
-		</div>
+		</>
 	);
 }

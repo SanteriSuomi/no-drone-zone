@@ -17,17 +17,20 @@ function euclideanDistance(
 	return Math.hypot(endX - startX, endY - startY);
 }
 
-async function refreshViolations(currentViolations: Violation[]) {
+async function refreshViolations(savedViolations: Violation[]) {
 	let violations: Violation[] | null;
 	const response = await fetch(API_URL_DRONES);
 	const result = await response.text();
-	try {
-		const parseResult = await parseStringPromise(result);
-		const drones = parseResult.report.capture[0].drone;
-		violations = await getUpdatedViolations(drones, [...currentViolations]);
-	} catch (error) {
-		console.log(error);
-	}
+	await parseStringPromise(result, { explicitArray: false })
+		.then(async (parseResult) => {
+			const drones = parseResult.report.capture.drone;
+			violations = await getUpdatedViolations(drones, [
+				...savedViolations,
+			]);
+		})
+		.catch((reason) => {
+			console.log(reason);
+		});
 	return violations;
 }
 
@@ -39,13 +42,13 @@ async function getUpdatedViolations(
 		drones.map(async (drone: Drone) => {
 			const distance = euclideanDistance(
 				NDZ_MID_POINT.x,
-				drone.positionX[0],
+				drone.positionX,
 				NDZ_MID_POINT.y,
-				drone.positionY[0]
+				drone.positionY
 			);
 			if (distance <= NDZ_RADIUS) {
 				const response = await fetch(
-					API_URL_PILOTS + drone.serialNumber[0]
+					API_URL_PILOTS + drone.serialNumber
 				);
 				const pilot = await response.json();
 				return Promise.resolve({
@@ -71,7 +74,7 @@ async function getUpdatedViolations(
 			violation.timestamp + EXPIRATION_TIME > new Date().getTime()
 		) {
 			updatedViolations.push(violation);
-			savedViolationMap.set(violation.drone.mac[0], {
+			savedViolationMap.set(violation.drone.mac, {
 				violation: violation,
 				index: index,
 			});
@@ -81,7 +84,7 @@ async function getUpdatedViolations(
 	retrievedViolations.forEach((violation: Violation | void) => {
 		if (violation) {
 			const existingViolation = savedViolationMap.get(
-				violation.drone.mac[0]
+				violation.drone.mac
 			);
 			if (existingViolation) {
 				updatedViolations[existingViolation.index] = violation;
