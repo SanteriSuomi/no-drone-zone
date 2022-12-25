@@ -7,6 +7,7 @@
 	"scripts": {
 		"build": "npm install && tsc",
 		"start": "node .",
+		"dev": "tsc && node .",
 		"dev-watch": "tsc -w",
 		"dev-run": "nodemon ."
 	},

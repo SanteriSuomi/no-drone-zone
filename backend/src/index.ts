@@ -1,7 +1,12 @@
 import { WebSocketServer } from "ws";
 import { Violation } from "./types/types.js";
 import { refreshViolations } from "./utils/functions.js";
-import { MAX_ERROR_COUNT, PORT, REFRESH_SPEED } from "./utils/constants.js";
+import {
+	DATABASE_FILE_PATH,
+	MAX_ERROR_COUNT,
+	PORT,
+	REFRESH_SPEED,
+} from "./utils/constants.js";
 import { Low, JSONFile } from "lowdb";
 import express from "express";
 
@@ -12,7 +17,7 @@ const server = app.listen(PORT, () => {
 });
 
 const ws = new WebSocketServer({ server: server });
-const db = new Low<Violation[]>(new JSONFile("db.json"));
+const db = new Low<Violation[]>(new JSONFile(DATABASE_FILE_PATH));
 let timer: NodeJS.Timer | null;
 let errorCount = 0;
 
@@ -34,7 +39,12 @@ app.get("/health", (_request, response) => {
 });
 
 ws.on("connection", async (client) => {
-	if (!db.data) await db.read();
+	if (!db.data) {
+		await db.read();
+		if (!db.data) {
+			db.data = [];
+		}
+	}
 	client.send(JSON.stringify(db.data));
 });
 
