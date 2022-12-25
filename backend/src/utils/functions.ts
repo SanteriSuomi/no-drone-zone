@@ -7,6 +7,7 @@ import {
 	NDZ_MID_POINT,
 	NDZ_RADIUS,
 } from "../utils/constants.js";
+import { ServerResponse, IncomingMessage } from "http";
 
 function euclideanDistance(
 	startX: number,
@@ -102,4 +103,14 @@ async function getPilots(drones: Drone[]): Promise<(Violation | void)[]> {
 	);
 }
 
-export { refreshViolations, getUpdatedViolations };
+function writeResponse(
+	response: ServerResponse<IncomingMessage>,
+	statusCode: number,
+	message: string
+) {
+	response.writeHead(statusCode);
+	response.write(message);
+	return response.end();
+}
+
+export { refreshViolations, getUpdatedViolations, writeResponse };

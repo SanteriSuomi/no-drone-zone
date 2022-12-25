@@ -2,7 +2,7 @@ import http from "http";
 import { WebSocketServer } from "ws";
 import { Low, JSONFile } from "lowdb";
 import { Violation } from "./types/types.js";
-import { refreshViolations } from "./utils/functions.js";
+import { refreshViolations, writeResponse } from "./utils/functions.js";
 import {
 	API_URL_HEALTH,
 	API_URL_WS,
@@ -21,29 +21,24 @@ let errorCount = 0;
 
 server.on("request", (request, response) => {
 	const { url } = request;
-	console.log(url);
 	if (url === API_URL_HEALTH) {
-		response.statusCode = 500;
 		response.setHeader("Content-Type", "application/json");
 		for (const client of ws?.clients.values()) {
 			if (client.OPEN && !db.data) {
-				response.write(
+				return writeResponse(
+					response,
+					500,
 					"A websocket client has open state but database is null"
 				);
-				return response.end();
 			}
 		}
 		if (!violationUpdateJob) {
-			response.write("Timer not found");
-			return response.end();
+			return writeResponse(response, 500, "Timer not found");
 		}
 		if (errorCount > MAX_ERROR_COUNT) {
-			response.write("Error limit reached");
-			return response.end();
+			return writeResponse(response, 500, "Error limit reached");
 		}
-		response.statusCode = 500;
-		response.write("Ok");
-		return response.end();
+		return writeResponse(response, 200, "OK");
 	}
 });
 
