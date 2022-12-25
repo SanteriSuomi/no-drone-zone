@@ -19,8 +19,6 @@ const DATABASE_FILE_PATH = "data/db.json";
 
 const API_URL_HEALTH = "/health";
 
-const API_URL_WS = "/ws";
-
 const MAX_ERROR_COUNT = 10;
 
 export {
@@ -33,6 +31,5 @@ export {
 	API_URL_PILOTS,
 	DATABASE_FILE_PATH,
 	API_URL_HEALTH,
-	API_URL_WS,
 	MAX_ERROR_COUNT,
 };

@@ -5,7 +5,6 @@ import { Violation } from "./types/types.js";
 import { refreshViolations, writeResponse } from "./utils/functions.js";
 import {
 	API_URL_HEALTH,
-	API_URL_WS,
 	DATABASE_FILE_PATH,
 	MAX_ERROR_COUNT,
 	PORT,
@@ -13,7 +12,7 @@ import {
 } from "./utils/constants.js";
 
 const server = http.createServer();
-const ws = new WebSocketServer({ server: server, path: API_URL_WS });
+const ws = new WebSocketServer({ server: server });
 const db = new Low<Violation[]>(new JSONFile(DATABASE_FILE_PATH));
 
 let violationUpdateJob: NodeJS.Timer | null;
