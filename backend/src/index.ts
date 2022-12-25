@@ -14,7 +14,7 @@ import { resolve, dirname } from "path";
 const server = http.createServer();
 const ws = new WebSocketServer({ server: server });
 const db = new Low<Violation[]>(
-	new JSONFile(resolve(dirname("./"), DATABASE_FILE_NAME))
+	new JSONFile(resolve(dirname("./"), "data", DATABASE_FILE_NAME))
 );
 
 let violationUpdateJob: NodeJS.Timer | null;
