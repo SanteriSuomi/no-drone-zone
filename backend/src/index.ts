@@ -9,12 +9,12 @@ import {
 	PORT,
 	REFRESH_SPEED,
 } from "./utils/constants.js";
-import path, { dirname } from "path";
+import { resolve, dirname } from "path";
 
 const server = http.createServer();
 const ws = new WebSocketServer({ server: server });
 const db = new Low<Violation[]>(
-	new JSONFile(path.resolve(dirname("./"), DATABASE_FILE_NAME))
+	new JSONFile(resolve(dirname("./"), DATABASE_FILE_NAME))
 );
 
 let violationUpdateJob: NodeJS.Timer | null;
