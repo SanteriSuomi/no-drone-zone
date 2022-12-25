@@ -16,14 +16,13 @@ export default function Violations() {
 				console.log(error);
 			}
 		};
-		return socket;
+		socket.onclose = () => {
+			openConnection();
+		};
 	};
 
 	useEffect(() => {
-		let socket = openConnection();
-		socket.onclose = () => {
-			socket = openConnection();
-		};
+		openConnection();
 	}, []);
 
 	const getViolationComponents = () => {
