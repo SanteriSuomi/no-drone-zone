@@ -21,6 +21,7 @@ let errorCount = 0;
 
 server.on("request", (request, response) => {
 	const { url } = request;
+	console.log(url);
 	if (url === API_URL_HEALTH) {
 		response.statusCode = 500;
 		response.setHeader("Content-Type", "application/json");
