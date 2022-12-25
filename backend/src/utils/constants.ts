@@ -19,8 +19,6 @@ const DATABASE_FILE_PATH = "data/db.json";
 
 const API_URL_HEALTH = "/health";
 
-const MAX_ERROR_COUNT = 10;
-
 export {
 	PORT,
 	NDZ_MID_POINT,
@@ -31,5 +29,4 @@ export {
 	API_URL_PILOTS,
 	DATABASE_FILE_PATH,
 	API_URL_HEALTH,
-	MAX_ERROR_COUNT,
 };

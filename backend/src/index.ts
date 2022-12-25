@@ -6,7 +6,6 @@ import { refreshViolations, writeResponse } from "./utils/functions.js";
 import {
 	API_URL_HEALTH,
 	DATABASE_FILE_PATH,
-	MAX_ERROR_COUNT,
 	PORT,
 	REFRESH_SPEED,
 } from "./utils/constants.js";
@@ -21,22 +20,6 @@ let errorCount = 0;
 server.on("request", (request, response) => {
 	const { url } = request;
 	if (url === API_URL_HEALTH) {
-		response.setHeader("Content-Type", "application/json");
-		for (const client of ws?.clients.values()) {
-			if (client.OPEN && !db.data) {
-				return writeResponse(
-					response,
-					500,
-					"A websocket client has open state but database is null"
-				);
-			}
-		}
-		if (!violationUpdateJob) {
-			return writeResponse(response, 500, "Timer not found");
-		}
-		if (errorCount > MAX_ERROR_COUNT) {
-			return writeResponse(response, 500, "Error limit reached");
-		}
 		return writeResponse(response, 200, "OK");
 	}
 });
