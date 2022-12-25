@@ -7,7 +7,7 @@ import ViolationComponent from "./violation";
 export default function Violations() {
 	const [violations, setViolations] = useState<Violation[]>([]);
 
-	useEffect(() => {
+	const openConnection = () => {
 		const socket = new WebSocket(WS_API_URL_VIOLATIONS);
 		socket.onmessage = (event) => {
 			try {
@@ -16,8 +16,13 @@ export default function Violations() {
 				console.log(error);
 			}
 		};
-		return () => {
-			socket.close();
+		return socket;
+	};
+
+	useEffect(() => {
+		let socket = openConnection();
+		socket.onclose = () => {
+			socket = openConnection();
 		};
 	}, []);
 
