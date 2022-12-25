@@ -29,7 +29,6 @@ ws.on("connection", async (client) => {
 		await db.read();
 		if (!db.data) {
 			db.data = [];
-			await db.write();
 		}
 	}
 	client.send(JSON.stringify(db.data));
