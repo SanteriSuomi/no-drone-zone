@@ -15,7 +15,7 @@ const API_URL_DRONES = "https://assignments.reaktor.com/birdnest/drones";
 
 const API_URL_PILOTS = "https://assignments.reaktor.com/birdnest/pilots/";
 
-const DATABASE_FILE_PATH = "./db.json";
+const DATABASE_FILE_NAME = "db.json";
 
 const API_URL_HEALTH = "/health";
 
@@ -27,6 +27,6 @@ export {
 	REFRESH_SPEED,
 	API_URL_DRONES,
 	API_URL_PILOTS,
-	DATABASE_FILE_PATH,
+	DATABASE_FILE_NAME,
 	API_URL_HEALTH,
 };
