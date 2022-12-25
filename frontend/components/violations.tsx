@@ -15,6 +15,7 @@ export default function Violations() {
 			} catch (error) {
 				console.log(error);
 			}
+			socket.send("keep-alive");
 		};
 		socket.onclose = () => {
 			openConnection();
