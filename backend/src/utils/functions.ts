@@ -20,7 +20,6 @@ function euclideanDistance(
 async function refreshViolations(savedViolations: Violation[]) {
 	const response = await fetch(API_URL_DRONES);
 	const result = await response.text();
-
 	let updateData: ApiData = { updated: false, violations: null };
 	await parseStringPromise(result, { explicitArray: false })
 		.then(async (parseResult) => {
