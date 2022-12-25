@@ -15,7 +15,7 @@ const API_URL_DRONES = "https://assignments.reaktor.com/birdnest/drones";
 
 const API_URL_PILOTS = "https://assignments.reaktor.com/birdnest/pilots/";
 
-const DATABASE_FILE_PATH = "data/db.json";
+const DATABASE_FILE_PATH = "./db.json";
 
 const API_URL_HEALTH = "/health";
 
