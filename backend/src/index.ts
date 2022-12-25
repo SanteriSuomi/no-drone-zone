@@ -11,18 +11,12 @@ import { Low, JSONFile } from "lowdb";
 import express from "express";
 
 const app = express();
-
-const server = app.listen(PORT, () => {
-	console.log(`Server listening on port ${PORT}`);
-});
-
-const ws = new WebSocketServer({ server: server });
 const db = new Low<Violation[]>(new JSONFile(DATABASE_FILE_PATH));
 let timer: NodeJS.Timer | null;
 let errorCount = 0;
 
 app.get("/health", (_request, response) => {
-	for (const client of ws.clients.values()) {
+	for (const client of ws?.clients.values()) {
 		if (client.OPEN && !db.data) {
 			return response
 				.status(500)
@@ -37,6 +31,12 @@ app.get("/health", (_request, response) => {
 	}
 	return response.status(200);
 });
+
+const server = app.listen(PORT, () => {
+	console.log(`Server listening on port ${PORT}`);
+});
+
+const ws = new WebSocketServer({ server: server });
 
 ws.on("connection", async (client) => {
 	if (!db.data) {
