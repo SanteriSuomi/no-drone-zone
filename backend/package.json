@@ -3,18 +3,21 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "dist/index.js",
+	"type": "module",
 	"scripts": {
 		"build": "npm install && tsc",
-		"start": "nodemon .",
+		"start": "node .",
 		"dev-watch": "tsc -w",
-		"dev-build": "npm run build && nodemon ."
+		"dev-run": "nodemon ."
 	},
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"@types/express": "^4.17.15",
 		"@types/ws": "^8.5.3",
 		"@types/xml2js": "^0.4.11",
-		"nodemon": "^2.0.20",
+		"express": "^4.18.2",
+		"lowdb": "^4.0.1",
 		"ts-node": "^10.9.1",
 		"typescript": "^4.9.4",
 		"ws": "^8.11.0",

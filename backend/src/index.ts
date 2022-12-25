@@ -1,27 +1,56 @@
-import WebSocket from "ws";
-import { Violation } from "./types/types";
-import { refreshViolations } from "./utils/functions";
-import { PORT, REFRESH_SPEED } from "./utils/constants";
+import { WebSocketServer } from "ws";
+import { Violation } from "./types/types.js";
+import { refreshViolations } from "./utils/functions.js";
+import { MAX_ERROR_COUNT, PORT, REFRESH_SPEED } from "./utils/constants.js";
+import { Low, JSONFile } from "lowdb";
+import express from "express";
 
-const websocketServer = new WebSocket.Server({ port: PORT });
+const app = express();
 
-let savedViolations: Violation[] = [];
-
-websocketServer.on("connection", (client) => {
-	client.send(JSON.stringify(savedViolations));
+const server = app.listen(PORT, () => {
+	console.log(`Server listening on port ${PORT}`);
 });
 
-setInterval(() => {
-	refreshViolations(savedViolations)
-		.then((updateData) => {
-			if (updateData.updated) {
-				savedViolations = updateData.violations;
-				websocketServer.clients.forEach((client) => {
-					client.send(JSON.stringify(savedViolations));
-				});
-			}
-		})
-		.catch((error) => {
-			console.log(error);
-		});
+const ws = new WebSocketServer({ server: server });
+const db = new Low<Violation[]>(new JSONFile("db.json"));
+let timer: NodeJS.Timer | null;
+let errorCount = 0;
+
+app.get("/health", (_request, response) => {
+	for (const client of ws.clients.values()) {
+		if (client.OPEN && !db.data) {
+			return response
+				.status(500)
+				.send("A websocket client has open state but database is null");
+		}
+	}
+	if (!timer) {
+		return response.status(500).send("Timer not found");
+	}
+	if (errorCount > MAX_ERROR_COUNT) {
+		return response.status(500).send("Error limit reached");
+	}
+	return response.status(200);
+});
+
+ws.on("connection", async (client) => {
+	if (!db.data) await db.read();
+	client.send(JSON.stringify(db.data));
+});
+
+timer = setInterval(async () => {
+	if (!db.data) return;
+	try {
+		const violationData = await refreshViolations(db.data);
+		if (violationData.updated) {
+			db.data = violationData.violations;
+			await db.write();
+			ws.clients.forEach((client) => {
+				client.send(JSON.stringify(db.data));
+			});
+		}
+	} catch (error) {
+		console.log(error);
+		errorCount += 1;
+	}
 }, REFRESH_SPEED);

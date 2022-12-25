@@ -13,12 +13,12 @@
 }
 
 .title {
-  font-size: 1.45em;
+  font-size: 1.525em;
   align-self: flex-start;
 }
 
 .subtitle {
-  font-size: 0.55em;
+  font-size: 0.575em;
   padding-left: 5px;
 }
 
@@ -34,12 +34,12 @@
 
 @media only screen and (max-width: 600px) {
   .violationList {
-    height: 75vh;
+    height: 76vh;
   }
 }
 
 @media only screen and (min-width: 600px) {
   .violationList {
-    height: 80vh;
+    height: 82vh;
   }
 }

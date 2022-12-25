@@ -46,6 +46,7 @@ export default function Violations() {
 					Violations{" "}
 					<span className={styles.subtitle}>
 						in the past 10 minutes sorted by distance to the nest
+						(ascending)
 					</span>
 				</div>
 				<div className={styles.violationList}>

@@ -1,12 +1,12 @@
 import { parseStringPromise } from "xml2js";
-import { ApiData, Drone, Violation } from "../types/types";
+import { ApiData, Drone, Violation } from "../types/types.js";
 import {
 	API_URL_DRONES,
 	API_URL_PILOTS,
 	EXPIRATION_TIME,
 	NDZ_MID_POINT,
 	NDZ_RADIUS,
-} from "../utils/constants";
+} from "../utils/constants.js";
 
 function euclideanDistance(
 	startX: number,
@@ -17,21 +17,16 @@ function euclideanDistance(
 	return Math.hypot(endX - startX, endY - startY);
 }
 
-async function refreshViolations(savedViolations: Violation[]) {
+async function refreshViolations(
+	savedViolations: Violation[]
+): Promise<ApiData> {
 	const response = await fetch(API_URL_DRONES);
 	const result = await response.text();
-	let updateData: ApiData = { updated: false, violations: null };
-	await parseStringPromise(result, { explicitArray: false })
-		.then(async (parseResult) => {
-			const drones = parseResult.report.capture.drone;
-			updateData = await getUpdatedViolations(drones, [
-				...savedViolations,
-			]);
-		})
-		.catch((reason) => {
-			console.log(reason);
-		});
-	return updateData;
+	const parseResult = await parseStringPromise(result, {
+		explicitArray: false,
+	});
+	const drones = parseResult.report.capture.drone;
+	return await getUpdatedViolations(drones, [...savedViolations]);
 }
 
 async function getUpdatedViolations(
