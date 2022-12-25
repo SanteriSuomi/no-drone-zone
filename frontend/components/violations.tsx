@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import styles from "../styles/Violations.module.css";
 import { Violation } from "../types/types";
-import { WS_API_URL_VIOLATIONS } from "../utils/constants";
+import { WS_API_URL } from "../utils/constants";
 import ViolationComponent from "./violation";
 
 export default function Violations() {
 	const [violations, setViolations] = useState<Violation[]>([]);
 
 	const openConnection = () => {
-		const socket = new WebSocket(WS_API_URL_VIOLATIONS);
+		const socket = new WebSocket(WS_API_URL);
 		socket.onmessage = (event) => {
 			try {
 				setViolations(JSON.parse(event.data));
