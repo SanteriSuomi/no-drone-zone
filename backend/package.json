@@ -5,15 +5,16 @@
 	"main": "dist/index.js",
 	"scripts": {
 		"build": "npm install && tsc",
-		"start": "node .",
+		"start": "nodemon .",
 		"dev-watch": "tsc -w",
-		"dev": "npm run build && nodemon ."
+		"dev-build": "npm run build && nodemon ."
 	},
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"@types/ws": "^8.5.3",
 		"@types/xml2js": "^0.4.11",
+		"nodemon": "^2.0.20",
 		"ts-node": "^10.9.1",
 		"typescript": "^4.9.4",
 		"ws": "^8.11.0",

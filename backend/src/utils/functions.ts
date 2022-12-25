@@ -38,29 +38,7 @@ async function getUpdatedViolations(
 	drones: Drone[],
 	savedViolations: Violation[]
 ) {
-	const newViolations: (Violation | void)[] = await Promise.all(
-		drones.map(async (drone: Drone) => {
-			const distance = euclideanDistance(
-				NDZ_MID_POINT.x,
-				drone.positionX,
-				NDZ_MID_POINT.y,
-				drone.positionY
-			);
-			if (distance <= NDZ_RADIUS) {
-				const response = await fetch(
-					API_URL_PILOTS + drone.serialNumber
-				);
-				const pilot = await response.json();
-				return Promise.resolve({
-					timestamp: new Date().getTime(),
-					distance: distance,
-					drone: drone,
-					pilot: pilot,
-				});
-			}
-			return Promise.resolve();
-		})
-	);
+	const newViolations: (Violation | void)[] = await getPilots(drones);
 
 	const updatedViolations: Violation[] = [];
 	let updated = false;
@@ -101,6 +79,32 @@ async function getUpdatedViolations(
 		a.distance > b.distance ? 1 : -1
 	);
 	return { updated: updated, violations: updatedViolations };
+}
+
+async function getPilots(drones: Drone[]): Promise<(Violation | void)[]> {
+	return await Promise.all(
+		drones.map(async (drone: Drone) => {
+			const distance = euclideanDistance(
+				NDZ_MID_POINT.x,
+				drone.positionX,
+				NDZ_MID_POINT.y,
+				drone.positionY
+			);
+			if (distance <= NDZ_RADIUS) {
+				const response = await fetch(
+					API_URL_PILOTS + drone.serialNumber
+				);
+				const pilot = await response.json();
+				return Promise.resolve({
+					timestamp: new Date().getTime(),
+					distance: distance,
+					drone: drone,
+					pilot: pilot,
+				});
+			}
+			return Promise.resolve();
+		})
+	);
 }
 
 export { refreshViolations, getUpdatedViolations };

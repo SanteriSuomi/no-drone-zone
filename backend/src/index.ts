@@ -11,12 +11,17 @@ websocketServer.on("connection", (client) => {
 	client.send(JSON.stringify(savedViolations));
 });
 
-setInterval(async () => {
-	const updateData = await refreshViolations(savedViolations);
-	if (updateData.updated) {
-		savedViolations = updateData.violations;
-		websocketServer.clients.forEach((client) => {
-			client.send(JSON.stringify(savedViolations));
+setInterval(() => {
+	refreshViolations(savedViolations)
+		.then((updateData) => {
+			if (updateData.updated) {
+				savedViolations = updateData.violations;
+				websocketServer.clients.forEach((client) => {
+					client.send(JSON.stringify(savedViolations));
+				});
+			}
+		})
+		.catch((error) => {
+			console.log(error);
 		});
-	}
 }, REFRESH_SPEED);
