@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
 import styles from "../styles/Violations.module.css";
 import { Violation } from "../types/types";
-import { WS_API_URL } from "../utils/constants";
 import ViolationComponent from "./violation";
 
 export default function Violations() {
 	const [violations, setViolations] = useState<Violation[]>([]);
 
 	const openConnection = () => {
-		const socket = new WebSocket(WS_API_URL);
+		if (
+			!process.env.NEXT_PUBLIC_WS_API_URL ||
+			!process.env.NEXT_PUBLIC_WS_ACCESS_KEY
+		) {
+			return console.error("ENV keys not defined");
+		}
+		const socket = new WebSocket(
+			process.env.NEXT_PUBLIC_WS_API_URL,
+			process.env.NEXT_PUBLIC_WS_ACCESS_KEY
+		);
 		socket.onmessage = (event) => {
 			try {
 				setViolations(JSON.parse(event.data));

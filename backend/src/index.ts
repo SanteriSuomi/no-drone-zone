@@ -2,7 +2,7 @@ import http from "http";
 import { WebSocketServer } from "ws";
 import { Low, JSONFile } from "lowdb";
 import { Violation } from "./types/types.js";
-import { refreshViolations, writeResponse } from "./utils/functions.js";
+import { authenticate, refreshViolations } from "./utils/functions.js";
 import {
 	API_URL_HEALTH,
 	DATABASE_FILE_NAME,
@@ -11,33 +11,46 @@ import {
 } from "./utils/constants.js";
 import { resolve, dirname } from "path";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 const server = http.createServer();
 const ws = new WebSocketServer({ server: server });
 const db = new Low<Violation[]>(
 	new JSONFile(resolve(dirname("./"), "data", DATABASE_FILE_NAME))
 );
 
-let violationUpdateJob: NodeJS.Timer | null;
-let errorCount = 0;
-
 server.on("request", (request, response) => {
-	const { url } = request;
-	if (url === API_URL_HEALTH) {
-		return writeResponse(response, 200, "OK");
-	}
-});
-
-ws.on("connection", async (client) => {
-	if (!db.data) {
-		await db.read();
-		if (!db.data) {
-			db.data = [];
+	if (authenticate(request)) {
+		const { url } = request;
+		if (url === API_URL_HEALTH) {
+			response.writeHead(200);
+			response.write("Ok");
 		}
+	} else {
+		response.writeHead(403);
+		response.write("Not authorized");
 	}
-	client.send(JSON.stringify(db.data));
+	response.end();
 });
 
-violationUpdateJob = setInterval(async () => {
+ws.on("connection", async (client, request) => {
+	if (authenticate(request)) {
+		console.log("New WS client " + request.socket.remoteAddress);
+		if (!db.data) {
+			await db.read();
+			if (!db.data) {
+				db.data = [];
+			}
+		}
+		client.send(JSON.stringify(db.data));
+	} else {
+		client.send("Not authorized");
+		client.terminate();
+	}
+});
+
+setInterval(async () => {
 	if (!db.data) return;
 	try {
 		const violationData = await refreshViolations(db.data);
@@ -50,7 +63,6 @@ violationUpdateJob = setInterval(async () => {
 		}
 	} catch (error) {
 		console.log(error);
-		errorCount += 1;
 	}
 }, REFRESH_SPEED);
 

@@ -1,13 +1,11 @@
 import { parseStringPromise } from "xml2js";
 import { ApiData, Drone, Violation } from "../types/types.js";
 import {
-	API_URL_DRONES,
-	API_URL_PILOTS,
 	EXPIRATION_TIME,
 	NDZ_MID_POINT,
 	NDZ_RADIUS,
 } from "../utils/constants.js";
-import { ServerResponse, IncomingMessage } from "http";
+import { IncomingMessage } from "http";
 
 function euclideanDistance(
 	startX: number,
@@ -21,7 +19,7 @@ function euclideanDistance(
 async function refreshViolations(
 	savedViolations: Violation[]
 ): Promise<ApiData> {
-	const response = await fetch(API_URL_DRONES);
+	const response = await fetch(process.env.API_URL_DRONES);
 	const result = await response.text();
 	const parseResult = await parseStringPromise(result, {
 		explicitArray: false,
@@ -49,7 +47,7 @@ async function getUpdatedViolations(
 			violation.timestamp + EXPIRATION_TIME > new Date().getTime()
 		) {
 			updatedViolations.push(violation);
-			savedViolationMap.set(violation.drone.mac, {
+			savedViolationMap.set(violation.drone.serialNumber, {
 				violation: violation,
 				index: index,
 			});
@@ -60,7 +58,7 @@ async function getUpdatedViolations(
 	newViolations.forEach((violation: Violation | void) => {
 		if (violation) {
 			const existingViolation = savedViolationMap.get(
-				violation.drone.mac
+				violation.drone.serialNumber
 			);
 			if (existingViolation) {
 				updatedViolations[existingViolation.index] = violation;
@@ -86,9 +84,9 @@ async function getPilots(drones: Drone[]): Promise<(Violation | void)[]> {
 				NDZ_MID_POINT.y,
 				drone.positionY
 			);
-			if (distance <= NDZ_RADIUS) {
+			if (distance < NDZ_RADIUS) {
 				const response = await fetch(
-					API_URL_PILOTS + drone.serialNumber
+					process.env.API_URL_PILOTS + drone.serialNumber
 				);
 				const pilot = await response.json();
 				return Promise.resolve({
@@ -103,14 +101,10 @@ async function getPilots(drones: Drone[]): Promise<(Violation | void)[]> {
 	);
 }
 
-function writeResponse(
-	response: ServerResponse<IncomingMessage>,
-	statusCode: number,
-	message: string
-) {
-	response.writeHead(statusCode);
-	response.write(message);
-	return response.end();
+function authenticate(request: IncomingMessage) {
+	return (
+		request.headers["sec-websocket-protocol"] === process.env.WS_ACCESS_KEY
+	);
 }
 
-export { refreshViolations, getUpdatedViolations, writeResponse };
+export { refreshViolations, getUpdatedViolations, authenticate };

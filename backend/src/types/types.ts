@@ -24,12 +24,12 @@ interface Violation {
 	timestamp: number;
 	distance: number;
 	drone: Drone;
-	pilot: Pilot | null;
+	pilot?: Pilot;
 }
 
 interface ApiData {
 	updated: boolean;
-	violations: Violation[] | null;
+	violations?: Violation[];
 }
 
 export type { Drone, Pilot, Violation, ApiData };
