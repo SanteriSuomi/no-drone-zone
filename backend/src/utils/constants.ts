@@ -1,5 +1,5 @@
 const PORT = 4000;
-const REFRESH_SPEED = 3000;
+const REFRESH_SPEED = 4000;
 const NDZ_MID_POINT = {
 	x: 250000,
 	y: 250000,

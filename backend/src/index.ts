@@ -21,33 +21,41 @@ const db = new Low<Violation[]>(
 );
 
 server.on("request", (request, response) => {
-	const { url } = request;
-	if (url === API_URL_HEALTH) {
-		response.writeHead(200);
-		response.write("Ok");
-		response.end();
+	try {
+		const { url } = request;
+		if (url === API_URL_HEALTH) {
+			response.writeHead(200);
+			response.write("Ok");
+			response.end();
+		}
+	} catch (error) {
+		console.log(error);
 	}
 });
 
 ws.on("connection", async (client, request) => {
-	if (authenticate(request)) {
-		console.log("New WS client " + request.socket.remoteAddress);
-		if (!db.data) {
-			await db.read();
+	try {
+		if (authenticate(request)) {
+			console.log("New WS client " + request.socket.remoteAddress);
 			if (!db.data) {
-				db.data = [];
+				await db.read();
+				if (!db.data) {
+					db.data = [];
+				}
 			}
+			client.send(JSON.stringify(db.data));
+		} else {
+			client.send("Not authorized");
+			client.terminate();
 		}
-		client.send(JSON.stringify(db.data));
-	} else {
-		client.send("Not authorized");
-		client.terminate();
+	} catch (error) {
+		console.log(error);
 	}
 });
 
 setInterval(async () => {
-	if (!db.data) return;
 	try {
+		if (!db.data) return;
 		const violationData = await refreshViolations(db.data);
 		if (violationData.updated) {
 			db.data = violationData.violations;
