@@ -21,17 +21,12 @@ const db = new Low<Violation[]>(
 );
 
 server.on("request", (request, response) => {
-	if (authenticate(request)) {
-		const { url } = request;
-		if (url === API_URL_HEALTH) {
-			response.writeHead(200);
-			response.write("Ok");
-		}
-	} else {
-		response.writeHead(403);
-		response.write("Not authorized");
+	const { url } = request;
+	if (url === API_URL_HEALTH) {
+		response.writeHead(200);
+		response.write("Ok");
+		response.end();
 	}
-	response.end();
 });
 
 ws.on("connection", async (client, request) => {
