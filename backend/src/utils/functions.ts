@@ -25,12 +25,16 @@ async function refreshViolations(
 		explicitArray: false,
 	});
 	const drones = parseResult.report.capture.drone;
-	return await getUpdatedViolations(drones, [...savedViolations]);
+	const timestamp = new Date(
+		parseResult.report.capture.$.snapshotTimestamp
+	).getTime();
+	return await getUpdatedViolations(drones, [...savedViolations], timestamp);
 }
 
 async function getUpdatedViolations(
 	drones: Drone[],
-	savedViolations: Violation[]
+	savedViolations: Violation[],
+	timestamp: number
 ) {
 	const newViolations: (Violation | void)[] = await getPilots(drones);
 
@@ -57,6 +61,7 @@ async function getUpdatedViolations(
 
 	newViolations.forEach((violation: Violation | void) => {
 		if (violation) {
+			violation.timestamp = timestamp;
 			const existingViolation = savedViolationMap.get(
 				violation.drone.serialNumber
 			);
@@ -90,7 +95,7 @@ async function getPilots(drones: Drone[]): Promise<(Violation | void)[]> {
 				);
 				const pilot = await response.json();
 				return Promise.resolve({
-					timestamp: new Date().getTime(),
+					timestamp: 0,
 					distance: distance,
 					drone: drone,
 					pilot: pilot,
