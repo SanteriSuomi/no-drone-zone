@@ -9,16 +9,11 @@ function processHttpRequest(
 	request: IncomingMessage,
 	response: ServerResponse<IncomingMessage>
 ) {
-	try {
-		const { url } = request;
-		if (url === API_URL_HEALTH) {
-			response.writeHead(200);
-			response.write("Ok");
-			response.end();
-		}
-	} catch (error) {
-		console.error(error, error.stack);
+	const { url } = request;
+	if (url === API_URL_HEALTH) {
+		response.writeHead(204).end();
 	}
+	response.writeHead(404).end();
 }
 
 async function processWebsocketRequest(
@@ -41,7 +36,7 @@ async function processWebsocketRequest(
 			client.terminate();
 		}
 	} catch (error) {
-		console.error(error, error.stack);
+		console.error(error);
 	}
 }
 
@@ -57,7 +52,7 @@ async function processInternalJob(ws: WebSocketServer, db: Low<Violation[]>) {
 			});
 		}
 	} catch (error) {
-		console.error(error, error.stack);
+		console.error(error);
 	}
 }
 
