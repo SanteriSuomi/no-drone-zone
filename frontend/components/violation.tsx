@@ -7,28 +7,27 @@ export default function ViolationComponent({
 	violation: Violation;
 }) {
 	const getPilotDetails = () => {
-		if (violation.pilot) {
+		const pilot = violation.pilot;
+		if (pilot.pilotId.length > 0) {
 			return (
 				<>
 					<div className={styles.infoText}>
 						<span className={styles.infoTextTitle}>
 							Name &nbsp; &nbsp; &nbsp; &nbsp;
 						</span>
-						{violation.pilot.firstName +
-							" " +
-							violation.pilot.lastName}
+						{pilot.firstName + " " + pilot.lastName}
 					</div>
 					<div className={styles.infoText}>
 						<span className={styles.infoTextTitle}>
 							Email &nbsp; &nbsp; &nbsp; &nbsp;
 						</span>
-						{violation.pilot.email}
+						{pilot.email}
 					</div>
 					<div className={styles.infoText}>
 						<span className={styles.infoTextTitle}>
 							Phone &nbsp; &nbsp; &nbsp;
 						</span>
-						{violation.pilot.phoneNumber}
+						{pilot.phoneNumber}
 					</div>
 				</>
 			);

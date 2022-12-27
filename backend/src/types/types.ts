@@ -24,7 +24,7 @@ interface Violation {
 	timestamp: number;
 	distance: number;
 	drone: Drone;
-	pilot?: Pilot;
+	pilot: Pilot;
 }
 
 interface ApiData {

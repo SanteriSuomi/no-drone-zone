@@ -24,7 +24,7 @@ interface Violation {
 	timestamp: number;
 	distance: number;
 	drone: Drone;
-	pilot: Pilot | null;
+	pilot: Pilot;
 }
 
 export type { Drone, Pilot, Violation };

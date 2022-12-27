@@ -10,6 +10,7 @@
   align-items: center;
   width: 75%;
   max-width: 500px;
+  min-width: 315px;
 }
 
 .title {
@@ -18,7 +19,7 @@
 }
 
 .subtitle {
-  font-size: 0.575em;
+  font-size: 0.55em;
   padding-left: 5px;
 }
 

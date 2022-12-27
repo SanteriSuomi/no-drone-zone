@@ -1,7 +1,6 @@
 {
-	"name": "backend",
-	"version": "1.0.0",
-	"description": "",
+	"name": "no-drone-zone-backend",
+	"version": "1.0",
 	"main": "dist/index.js",
 	"type": "module",
 	"scripts": {
@@ -11,8 +10,6 @@
 		"dev-watch": "tsc -w",
 		"dev-run": "nodemon ."
 	},
-	"author": "",
-	"license": "ISC",
 	"dependencies": {
 		"@types/ws": "^8.5.3",
 		"@types/xml2js": "^0.4.11",

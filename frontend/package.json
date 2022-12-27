@@ -1,7 +1,6 @@
 {
-	"name": "no-bird-zone",
+	"name": "no-drone-zone-frontend",
 	"version": "1.0",
-	"private": true,
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",

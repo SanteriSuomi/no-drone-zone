@@ -1,20 +1,7 @@
 import { parseStringPromise } from "xml2js";
-import { ApiData, Drone, Violation } from "../types/types.js";
-import {
-	EXPIRATION_TIME,
-	NDZ_MID_POINT,
-	NDZ_RADIUS,
-} from "../utils/constants.js";
+import { ApiData, Drone, Pilot, Violation } from "../types/types.js";
+import { EXPIRATION_TIME, NDZ_MID_POINT, NDZ_RADIUS } from "./constants.js";
 import { IncomingMessage } from "http";
-
-function euclideanDistance(
-	startX: number,
-	endX: number,
-	startY: number,
-	endY: number
-): number {
-	return Math.hypot(endX - startX, endY - startY);
-}
 
 async function refreshViolations(
 	savedViolations: Violation[]
@@ -38,38 +25,32 @@ async function getUpdatedViolations(
 ) {
 	const newViolations: (Violation | void)[] = await getPilots(drones);
 
-	const updatedViolations: Violation[] = [];
 	let updated = false;
+	let updatedViolations: Violation[] = [];
 
-	const savedViolationMap = new Map<
-		string,
-		{ violation: Violation; index: number }
-	>();
-	savedViolations.forEach((violation: Violation, index: number) => {
+	const savedViolationMap = new Map<string, Violation>();
+	savedViolations.forEach((violation?: Violation) => {
 		if (
 			violation &&
 			violation.timestamp + EXPIRATION_TIME > new Date().getTime()
 		) {
 			updatedViolations.push(violation);
-			savedViolationMap.set(violation.drone.serialNumber, {
-				violation: violation,
-				index: index,
-			});
+			savedViolationMap.set(violation.drone.serialNumber, violation);
 			updated = true;
 		}
 	});
 
-	newViolations.forEach((violation: Violation | void) => {
+	newViolations.forEach((violation?: Violation) => {
 		if (violation) {
 			violation.timestamp = timestamp;
-			const existingViolation = savedViolationMap.get(
-				violation.drone.serialNumber
-			);
-			if (existingViolation) {
-				updatedViolations[existingViolation.index] = violation;
-			} else {
-				updatedViolations.push(violation);
+			if (savedViolationMap.has(violation.drone.serialNumber)) {
+				updatedViolations = updatedViolations.filter((v: Violation) => {
+					return (
+						v.drone.serialNumber !== violation.drone.serialNumber
+					);
+				});
 			}
+			updatedViolations.push(violation);
 			updated = true;
 		}
 	});
@@ -81,29 +62,41 @@ async function getUpdatedViolations(
 }
 
 async function getPilots(drones: Drone[]): Promise<(Violation | void)[]> {
-	return await Promise.all(
-		drones.map(async (drone: Drone) => {
-			const distance = euclideanDistance(
-				NDZ_MID_POINT.x,
-				drone.positionX,
-				NDZ_MID_POINT.y,
-				drone.positionY
-			);
-			if (distance < NDZ_RADIUS) {
-				const response = await fetch(
-					process.env.API_URL_PILOTS + drone.serialNumber
-				);
-				const pilot = await response.json();
-				return Promise.resolve({
-					timestamp: 0,
-					distance: distance,
-					drone: drone,
-					pilot: pilot,
-				});
-			}
-			return Promise.resolve();
-		})
+	return await Promise.all(drones.map(retrievePilotData));
+}
+
+async function retrievePilotData(drone: Drone) {
+	const distanceToNest = euclideanDistance(
+		NDZ_MID_POINT.x,
+		drone.positionX,
+		NDZ_MID_POINT.y,
+		drone.positionY
 	);
+	if (distanceToNest <= NDZ_RADIUS) {
+		const response = await fetch(
+			process.env.API_URL_PILOTS + drone.serialNumber
+		);
+		let pilot: Pilot = <Pilot>{};
+		if (response.status !== 404) {
+			pilot = await response.json();
+		}
+		return Promise.resolve({
+			timestamp: 0,
+			distance: distanceToNest,
+			drone: drone,
+			pilot: pilot,
+		});
+	}
+	return Promise.resolve(null);
+}
+
+function euclideanDistance(
+	startX: number,
+	endX: number,
+	startY: number,
+	endY: number
+): number {
+	return Math.hypot(endX - startX, endY - startY);
 }
 
 function authenticate(request: IncomingMessage) {

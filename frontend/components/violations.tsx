@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import styles from "../styles/Violations.module.css";
 import { Violation } from "../types/types";
 import ViolationComponent from "./violation";
+import styles from "../styles/Violations.module.css";
 
 export default function Violations() {
 	const [violations, setViolations] = useState<Violation[]>([]);
@@ -35,11 +35,10 @@ export default function Violations() {
 	}, []);
 
 	const getViolationComponents = () => {
-		return violations?.map((violation: Violation, index: number) => {
-			if (!violation) return <></>;
+		return violations.map((violation: Violation) => {
 			return (
 				<ViolationComponent
-					key={index}
+					key={violation.drone.serialNumber}
 					violation={violation}
 				></ViolationComponent>
 			);
@@ -53,8 +52,8 @@ export default function Violations() {
 				<div className={styles.title}>
 					Violations{" "}
 					<span className={styles.subtitle}>
-						in the past 10 minutes sorted by distance to the nest
-						(ascending)
+						in the past 10 minutes sorted by distance to the nest in
+						ascending order
 					</span>
 				</div>
 				<div className={styles.violationList}>
