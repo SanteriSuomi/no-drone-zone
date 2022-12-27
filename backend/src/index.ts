@@ -8,7 +8,7 @@ import {
 	processHttpRequest,
 	processWebsocketRequest,
 	processInternalJob,
-} from "./utils/network_functions.js";
+} from "./requests.js";
 
 import dotenv from "dotenv";
 dotenv.config();

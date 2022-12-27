@@ -105,4 +105,4 @@ function authenticate(request: IncomingMessage) {
 	);
 }
 
-export { refreshViolations, getUpdatedViolations, authenticate };
+export { refreshViolations, authenticate };

@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { WebSocket, WebSocketServer } from "ws";
 import { Low } from "lowdb";
-import { Violation } from "../types/types.js";
-import { authenticate, refreshViolations } from "./general_functions.js";
-import { API_URL_HEALTH } from "./constants.js";
+import { Violation } from "./types/types.js";
+import { authenticate, refreshViolations } from "./utils/functions.js";
+import { API_URL_HEALTH } from "./utils/constants.js";
 
 function processHttpRequest(
 	request: IncomingMessage,
@@ -11,7 +11,7 @@ function processHttpRequest(
 ) {
 	const { url } = request;
 	if (url === API_URL_HEALTH) {
-		response.writeHead(204).end();
+		return response.writeHead(204).end();
 	}
 	response.writeHead(404).end();
 }
