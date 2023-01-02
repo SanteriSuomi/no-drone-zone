@@ -1,5 +1,5 @@
 # no-drone-zone
  
-Job application assignment
+Reaktor job application assignment
 
 Deployed at https://no-drone-zone.vercel.app/
