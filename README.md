@@ -1,9 +1,3 @@
-# no-drone-zone
- 
-Reaktor job application assignment
-
-Deployed at https://no-drone-zone.vercel.app/
-
 # Objective
 Build and deploy a web application which lists all the pilots who recently violated a NDZ (no drone zone) perimeter.
 
